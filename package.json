@@ -1,0 +1,19 @@
+{
+  "name": "buy-with-card",
+  "version": "1.0.0",
+  "description": "This bot helps to buy Bytes with Visa or Mastercard",
+  "main": "buy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "tony",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.5.0",
+    "byteballcore": "git+https://github.com/byteball/byteballcore.git",
+    "emailjs": "^1.0.10",
+    "headless-byteball": "git+https://github.com/byteball/headless-byteball.git",
+    "lodash": "^4.6.1",
+    "request": "^2.81.0"
+  }
+}

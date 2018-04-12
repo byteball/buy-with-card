@@ -1,0 +1,1 @@
+*/20 * * * * cd buy-with-card; node check_daemon.js 1>>~/.config/buy-with-card/check_daemon.log 2>>~/.config/buy-with-card/check_daemon.err
