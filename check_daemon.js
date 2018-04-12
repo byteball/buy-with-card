@@ -2,5 +2,5 @@
 "use strict";
 const check_daemon = require('byteballcore/check_daemon.js');
 
-check_daemon.checkDaemonAndNotify('node buy.js');
+check_daemon.checkDaemonAndNotify('node bot.js');
 
