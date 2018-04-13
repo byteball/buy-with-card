@@ -182,7 +182,7 @@ eventBus.once('headless_and_rates_ready', () => {
 									"UPDATE transactions SET provider_transaction_id=?, last_update="+db.getNow()+" WHERE transaction_id=?", 
 									[indacoin_transaction_id, transaction_id]
 								);
-								device.sendMessageToDevice(from_address, 'text', "Your order is created.  Please click this link to enter your card details and complete the payment: " + conf.BASE_URL + "/gw/payment_form?transaction_id=" + indacoin_transaction_id + "&partner=" + conf.indacoinPartner + "&cnfhash=" + encodeURIComponent(indacoin.getCnfHash(indacoin_transaction_id)) );
+								device.sendMessageToDevice(from_address, 'text', "Your order is created.  Please click this link to enter your card details and complete the payment: " + conf.BASE_URL + "/gw/payment_form?transaction_id=" + indacoin_transaction_id + "&partner=" + conf.indacoinPartner + "&cnfhash=" + encodeURIComponent(indacoin.getCnfHash(indacoin_transaction_id)) + "\n\nBe prepared that it takes some time after you enter your card details and before Indacoin sends your Bytes to you.");
 							});
 						}
 					);
