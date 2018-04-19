@@ -162,7 +162,7 @@ eventBus.once('headless_and_rates_ready', () => {
 			
 			if (/^[0-9.]+$/.test(ucText)) {
 				let amount = parseFloat(ucText);
-				if (amount < conf.minAmounts[userInfo.cur_in])
+				if (amount < conf.minAmounts[userInfo.cur_in] || isNaN(amount))
 					return device.sendMessageToDevice(from_address, 'text', 'Minimum amount is '+conf.minAmounts[userInfo.cur_in]+' '+userInfo.cur_in);
 				indacoin.getLimits(from_address, userInfo.cur_in, (err, body) => {
 					let maxAmount = body;
