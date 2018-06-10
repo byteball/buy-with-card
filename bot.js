@@ -67,10 +67,15 @@ function queryTransactionStatus(transaction_id){
 	});
 }
 
-function pollTransactions(){
-	db.query("SELECT transaction_id FROM transactions WHERE status='processing' AND provider_transaction_id IS NOT NULL", rows => {
-		rows.forEach(row => queryTransactionStatus(row.transaction_id));
-	});
+function pollTransactions(bOld){
+	let comparison = bOld ? '<=' : '>';
+	db.query(
+		"SELECT transaction_id FROM transactions \n\
+		WHERE status='processing' AND provider_transaction_id IS NOT NULL AND last_update "+comparison+" "+db.addTime('-6 HOUR'), 
+		rows => {
+			rows.forEach(row => queryTransactionStatus(row.transaction_id));
+		}
+	);
 }
 
 function sendGreetingAndAskNext(from_address, userInfo){
@@ -93,6 +98,7 @@ eventBus.once('headless_and_rates_ready', () => {
 	const headlessWallet = require('headless-byteball');
 	headlessWallet.setupChatEventHandlers();
 	setInterval(pollTransactions, 30*1000);
+	setInterval(() => pollTransactions(true), 30*60*1000);
 	
 	eventBus.on('text', (from_address, text) => {
 		let device = require('byteballcore/device');
