@@ -48,7 +48,9 @@ function getTransactionInfo(indacoin_transaction_id, handleResult){
 	});
 }
 
-function getStatusFromProviderStatus(provider_status){
+function getStatusFromProviderStatus(provider_status, provider_extra_status){
+	if (provider_status === 'Paid' && provider_extra_status === 'RejectedManual')
+		return 'failed';
 	switch (provider_status){
 		case 'Draft':
 		case 'Paid':

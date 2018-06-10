@@ -32,7 +32,7 @@ function queryTransactionStatus(transaction_id){
 						console.log('tx '+transaction_id+': status unchanged: '+txInfo.status);
 						return unlock();
 					}
-					let status = indacoin.getStatusFromProviderStatus(txInfo.status);
+					let status = indacoin.getStatusFromProviderStatus(txInfo.status, txInfo.extraStatus);
 					db.query(
 						"UPDATE transactions SET provider_status=?, status=?, last_update="+db.getNow()+" WHERE transaction_id=?", 
 						[txInfo.status, status, transaction_id],
