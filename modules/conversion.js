@@ -9,7 +9,7 @@ const notifications = require('./notifications');
 
 var GBYTE_BTC_rate;
 var BTC_USD_rate;
-var EUR_USD_rate = 1.23;
+var EUR_USD_rate = 1.18;
 var GBP_USD_rate;
 var USD_JPY_rate;
 var USD_RUR_rate;
