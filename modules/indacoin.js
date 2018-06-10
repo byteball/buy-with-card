@@ -82,16 +82,20 @@ function sendRequest(path, json, handleResult) {
 			"gw-sign": getSignature(nonce)
 		}
 	};
-	request(options, (err, response, body) => {
-		if (err){
-			console.error('error from '+path, json, err);
-			return handleResult(err);
-		}
-		if (response.statusCode !== 200){
-			console.error(response.statusCode+' status code from '+path, json);
-			return handleResult("non-200 status code: "+response.statusCode);
-		}
-		handleResult(null, body);
+	const mutex = require('byteballcore/mutex.js');
+	mutex.lock(['indacoin'], unlock => {
+		request(options, (err, response, body) => {
+			unlock();
+			if (err){
+				console.error('error from '+path, json, err);
+				return handleResult(err);
+			}
+			if (response.statusCode !== 200){
+				console.error(response.statusCode+' status code from '+path, json);
+				return handleResult("non-200 status code: "+response.statusCode);
+			}
+			handleResult(null, body);
+		});
 	});
 }
 
