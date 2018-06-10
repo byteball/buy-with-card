@@ -16,7 +16,7 @@ const reward = require('./modules/reward.js');
 
 
 function queryTransactionStatus(transaction_id){
-	mutex.lock(['tx-'+transaction_id], unlock => {
+	mutex.lockOrSkip(['tx-'+transaction_id], unlock => {
 		db.query(
 			"SELECT status, provider_status, provider_transaction_id, device_address, address, amount_usd FROM transactions WHERE transaction_id=?", 
 			[transaction_id],

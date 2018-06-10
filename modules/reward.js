@@ -51,7 +51,7 @@ function sendReward(address, reward, device_address, onDone) {
 
 function sendAndWriteReward(transaction_id) {
 	const mutex = require('byteballcore/mutex.js');
-	mutex.lock(['tx-'+transaction_id], (unlock) => {
+	mutex.lockOrSkip(['tx-'+transaction_id], (unlock) => {
 		db.query(
 			`SELECT device_address, reward_date, reward, address FROM transactions WHERE transaction_id=?`,
 			[transaction_id],
