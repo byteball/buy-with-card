@@ -248,3 +248,6 @@ eventBus.once('headless_wallet_ready', () => {
 		});
 	});
 });
+
+process.on('unhandledRejection', up => { throw up; });
+
