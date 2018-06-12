@@ -28,7 +28,7 @@ function queryTransactionStatus(transaction_id){
 					if (err)
 						return unlock();
 				//	console.error('tx', transaction_id, txInfo);
-					if (txInfo.status === row.provider_status){ // unchanged
+					if (txInfo.status === row.provider_status && txInfo.extraStatus !== 'RejectedManual'){ // unchanged
 						console.log('tx '+transaction_id+': status unchanged: '+txInfo.status);
 						return unlock();
 					}
