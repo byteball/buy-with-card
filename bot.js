@@ -18,7 +18,9 @@ const reward = require('./modules/reward.js');
 function queryTransactionStatus(transaction_id){
 	mutex.lockOrSkip(['tx-'+transaction_id], unlock => {
 		db.query(
-			"SELECT status, provider_status, provider_transaction_id, device_address, address, amount_usd FROM transactions WHERE transaction_id=?", 
+			"SELECT status, provider_status, provider_transaction_id, device_address, address, amount_usd, \n\
+				(SELECT src_profile FROM private_profiles WHERE private_profiles.address=transactions.address LIMIT 1) AS src_profile \n\
+			FROM transactions WHERE transaction_id=?", 
 			[transaction_id],
 			rows => {
 				let row = rows[0];
@@ -46,6 +48,10 @@ function queryTransactionStatus(transaction_id){
 								return unlock();
 							if (!conf.rewardPercentage)
 								return unlock();
+							if (!row.src_profile){
+								console.log('tx '+transaction_id+': no private profile found, not paying rewards');
+								return unlock();
+							}
 							reward.determineRewardAmounts(row.address, row.device_address, row.amount_usd, (rewardInUsd, rewardInBytes) => {
 								if (!rewardInBytes) // max reward already paid out
 									return unlock();
@@ -123,8 +129,8 @@ eventBus.once('headless_and_rates_ready', () => {
 			}
 			
 			if (validationUtils.isValidAddress(ucText)) {
-				if (conf.bRequireRealName)
-					return device.sendMessageToDevice(from_address, 'text', "You have to provide your attested profile, just Byteball address is not enough.");
+			//	if (conf.bRequireRealName)
+			//		return device.sendMessageToDevice(from_address, 'text', "You have to provide your attested profile, just Byteball address is not enough.");
 				return handleUserAddress(ucText);
 			}
 			else if (arrProfileMatches){
@@ -179,7 +185,7 @@ eventBus.once('headless_and_rates_ready', () => {
 						[from_address, userInfo.address, userInfo.cur_in, amount, conversion.getUsdAmount(amount, userInfo.cur_in)],
 						(res) => {
 							let transaction_id = res.insertId;
-							let extra_info = privateProfile.parseSrcProfile(userInfo.src_profile);
+							let extra_info = userInfo.src_profile ? privateProfile.parseSrcProfile(userInfo.src_profile) : undefined;
 							indacoin.createTransaction(transaction_id, userInfo.address, userInfo.cur_in, amount, extra_info, (err, body) => {
 								if (err)
 									return device.sendMessageToDevice(from_address, 'text', "Failed to create a transaction");

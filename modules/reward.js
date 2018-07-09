@@ -84,7 +84,7 @@ function sendAndWriteReward(transaction_id) {
 
 function retrySendingRewards() {
 	db.query(
-		`SELECT transaction_id FROM transactions WHERE status='success' AND reward_unit IS NULL`,
+		`SELECT transaction_id FROM transactions WHERE status='success' AND reward_unit IS NULL AND reward>0`,
 		(rows) => {
 			rows.forEach((row) => {
 				sendAndWriteReward(row.transaction_id);
