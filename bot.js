@@ -250,11 +250,9 @@ eventBus.once('headless_wallet_ready', () => {
 			throw new Error(error);
 		
 		const headlessWallet = require('headless-byteball');
-		const split = require('headless-byteball/split.js');
 		headlessWallet.readSingleAddress((distributionAddress) => {
 			console.log('== distribution address: ' + distributionAddress);
 			reward.distributionAddress = distributionAddress;
-			split.startCheckingAndSplittingLargestOutput(reward.distributionAddress);
 
 			setInterval(reward.retrySendingRewards, 60*1000);
 		});
