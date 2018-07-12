@@ -7,7 +7,7 @@ const conversion = require('./conversion');
 
 exports.distributionAddress = null;
 
-function determineRewardAmounts(address, device_address, amount_usd, handleRewards){
+function determineRewardAmounts(address, device_address, amount_usd, rewardPercentage, handleRewards){
 	db.query(
 		"SELECT SUM(reward_usd) AS total_reward FROM transactions WHERE (address=? OR device_address=?) AND reward_usd IS NOT NULL",
 		[address, device_address],
@@ -16,7 +16,7 @@ function determineRewardAmounts(address, device_address, amount_usd, handleRewar
 			if (total_reward >= conf.maxTotalRewardUSD)
 				return handleRewards(0, 0);
 			let maxRemainingReward = conf.maxTotalRewardUSD - total_reward;
-			let rewardInUsd = Math.round(amount_usd * conf.rewardPercentage/100 * 100) / 100;
+			let rewardInUsd = Math.round(amount_usd * rewardPercentage/100 * 100) / 100;
 			if (rewardInUsd > maxRemainingReward)
 				rewardInUsd = maxRemainingReward;
 			let rewardInBytes = conversion.usdToBytes(rewardInUsd);

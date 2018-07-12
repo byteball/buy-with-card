@@ -40,6 +40,15 @@ exports.providerPercentage = 9;
 exports.rewardPercentage = 6;
 exports.maxTotalRewardUSD = 100;
 
+exports.bonuses = {
+	JEDZYC2HMGDBIDQKG3XSTXUSHMCBK725: {
+		domain: 'Steem',
+		bonus_levels: [
+			{reputation: 50, bonus: 3},
+		]
+	},
+};
+
 exports.BASE_URL = 'https://indacoin.com';
 
 // override in conf.json

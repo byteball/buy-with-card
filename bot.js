@@ -13,6 +13,7 @@ const notifications = require('./modules/notifications');
 const conversion = require('./modules/conversion.js');
 const indacoin = require('./modules/indacoin.js');
 const reward = require('./modules/reward.js');
+const bonuses = require('./modules/bonuses.js');
 
 
 function queryTransactionStatus(transaction_id){
@@ -38,7 +39,7 @@ function queryTransactionStatus(transaction_id){
 					db.query(
 						"UPDATE transactions SET provider_status=?, status=?, last_update="+db.getNow()+" WHERE transaction_id=?", 
 						[txInfo.status, status, transaction_id],
-						() => {
+						async () => {
 							if (status === 'processing')
 								return unlock();
 							let device = require('byteballcore/device.js');
@@ -46,13 +47,18 @@ function queryTransactionStatus(transaction_id){
 								(status === 'success') ? "Your payment was successful" : "Your payment has failed");
 							if (status === 'failed')
 								return unlock();
-							if (!conf.rewardPercentage)
-								return unlock();
-							if (!row.src_profile){
+							let rewardPercentage = 0;
+							if (row.src_profile)
+								rewardPercentage += conf.rewardPercentage;
+							else
 								console.log('tx '+transaction_id+': no private profile found, not paying rewards');
+							let objBonus = await bonuses.getBonus(row.address);
+							rewardPercentage += objBonus.bonus;
+							if (!rewardPercentage){
+								console.log('tx '+transaction_id+': not paying rewards');
 								return unlock();
 							}
-							reward.determineRewardAmounts(row.address, row.device_address, row.amount_usd, (rewardInUsd, rewardInBytes) => {
+							reward.determineRewardAmounts(row.address, row.device_address, row.amount_usd, rewardPercentage, (rewardInUsd, rewardInBytes) => {
 								if (!rewardInBytes) // max reward already paid out
 									return unlock();
 								db.query(
@@ -60,7 +66,10 @@ function queryTransactionStatus(transaction_id){
 									[rewardInUsd, rewardInBytes, transaction_id],
 									() => {
 										unlock();
-										device.sendMessageToDevice(row.device_address, 'text', "Thank you for buying Bytes with a card.  To offset a part of the fees you paid, you will receive a reward of $"+rewardInUsd.toLocaleString([], {maximumFractionDigits:2, minimumFractionDigits:2})+" in Bytes.");
+										let response = "Thank you for buying Bytes with a card.  To offset a part of the fees you paid, you will receive a reward of $"+rewardInUsd.toLocaleString([], {maximumFractionDigits:2, minimumFractionDigits:2})+" in Bytes.";
+										if (objBonus.bonus)
+											response += "\n\nThis includes the "+(row.src_profile ? "additional " : "")+objBonus.bonus+"% you receive as a "+objBonus.domain+" user with "+objBonus.field+" over "+objBonus.threshold_value+".";
+										device.sendMessageToDevice(row.device_address, 'text', response);
 										reward.sendAndWriteReward(transaction_id);
 									}
 								);
@@ -122,8 +131,11 @@ eventBus.once('headless_and_rates_ready', () => {
 				db.query(
 					'INSERT OR REPLACE INTO users (device_address, address) VALUES(?,?)', 
 					[from_address, address], 
-					() => {
+					async () => {
 						device.sendMessageToDevice(from_address, 'text', 'Saved your Byteball address'+(bWithData ? ' and personal data' : '')+'.\n\n' + texts.whatCurrency());
+						let objBonus = await bonuses.getBonus(address);
+						if (objBonus.bonus)
+							device.sendMessageToDevice(from_address, 'text', texts.bonus(objBonus));
 					}
 				);
 			}
@@ -186,7 +198,7 @@ eventBus.once('headless_and_rates_ready', () => {
 						(res) => {
 							let transaction_id = res.insertId;
 							let extra_info = userInfo.src_profile ? privateProfile.parseSrcProfile(userInfo.src_profile) : undefined;
-							indacoin.createTransaction(transaction_id, userInfo.address, userInfo.cur_in, amount, extra_info, (err, body) => {
+							indacoin.createTransaction(transaction_id, userInfo.address, userInfo.cur_in, amount, extra_info, async (err, body) => {
 								if (err)
 									return device.sendMessageToDevice(from_address, 'text', "Failed to create a transaction");
 								let indacoin_transaction_id = body;
@@ -194,7 +206,11 @@ eventBus.once('headless_and_rates_ready', () => {
 									"UPDATE transactions SET provider_transaction_id=?, last_update="+db.getNow()+" WHERE transaction_id=?", 
 									[indacoin_transaction_id, transaction_id]
 								);
-								device.sendMessageToDevice(from_address, 'text', "Your order is created.  Please click this link to enter your card details and complete the payment: " + conf.BASE_URL + "/gw/payment_form?transaction_id=" + indacoin_transaction_id + "&partner=" + conf.indacoinPartner + "&cnfhash=" + encodeURIComponent(indacoin.getCnfHash(indacoin_transaction_id)) + "\n\nBe prepared that it takes some time after you enter your card details and before Indacoin sends your Bytes to you.");
+								let response = "Your order is created.  Please click this link to enter your card details and complete the payment: " + conf.BASE_URL + "/gw/payment_form?transaction_id=" + indacoin_transaction_id + "&partner=" + conf.indacoinPartner + "&cnfhash=" + encodeURIComponent(indacoin.getCnfHash(indacoin_transaction_id)) + "\n\nBe prepared that it takes some time after you enter your card details and before Indacoin sends your Bytes to you.";
+								let objBonus = await bonuses.getBonus(userInfo.address);
+								if (objBonus.bonus)
+									response += "\n\n"+texts.bonus(objBonus);
+								device.sendMessageToDevice(from_address, 'text', response);
 							});
 						}
 					);
