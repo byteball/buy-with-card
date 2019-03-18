@@ -1,9 +1,9 @@
 /*jslint node: true */
 "use strict";
-var async = require('byteballcore/node_modules/async');
-var db = require('byteballcore/db.js');
-var eventBus = require('byteballcore/event_bus.js');
-var headlessWallet = require('headless-byteball');
+var async = require('ocore/node_modules/async');
+var db = require('ocore/db.js');
+var eventBus = require('ocore/event_bus.js');
+var headlessWallet = require('headless-obyte');
 
 
 const announcement = "The bot is now updated and allows to buy Bytes even without real name attestation.  However, in this case there is no partial reimbursement of the (rather high) fees, and Indacoin will perform its own verification.\n\nThis update is useful for users who don't have Bytes even to pay for the attestation.";
@@ -13,7 +13,7 @@ const message = announcement;// + optout_text;
 headlessWallet.setupChatEventHandlers();
 
 function sendAnnouncement(){
-	var device = require('byteballcore/device.js');
+	var device = require('ocore/device.js');
 	db.query(
 		"SELECT device_address FROM users",
 		rows => {
@@ -39,7 +39,7 @@ function sendAnnouncement(){
 }
 
 eventBus.on('text', function(from_address, text){
-	var device = require('byteballcore/device.js');
+	var device = require('ocore/device.js');
 	console.log('text from '+from_address+': '+text);
 	text = text.trim().toLowerCase();
 	/*if (text === 'optout'){

@@ -1,7 +1,7 @@
 /*jslint node: true */
 'use strict';
-const conf = require('byteballcore/conf');
-const db = require('byteballcore/db');
+const conf = require('ocore/conf');
+const db = require('ocore/db');
 const notifications = require('./notifications');
 const conversion = require('./conversion');
 
@@ -26,7 +26,7 @@ function determineRewardAmounts(address, device_address, amount_usd, rewardPerce
 }
 
 function sendReward(address, reward, device_address, onDone) {
-	let headlessWallet = require('headless-byteball');
+	let headlessWallet = require('headless-obyte');
 	headlessWallet.sendMultiPayment({
 		asset: null,
 		amount: reward,
@@ -37,7 +37,7 @@ function sendReward(address, reward, device_address, onDone) {
 	}, (err, unit) => {
 		if (err) {
 			console.error("failed to send reward: ", err);
-			let balances = require('byteballcore/balances');
+			let balances = require('ocore/balances');
 			balances.readBalance(exports.distributionAddress, (balance) => {
 				console.error(balance);
 				notifications.notifyAdmin('failed to send reward', err + ", balance: " + JSON.stringify(balance));
@@ -50,7 +50,7 @@ function sendReward(address, reward, device_address, onDone) {
 }
 
 function sendAndWriteReward(transaction_id) {
-	const mutex = require('byteballcore/mutex.js');
+	const mutex = require('ocore/mutex.js');
 	mutex.lockOrSkip(['tx-'+transaction_id], (unlock) => {
 		db.query(
 			`SELECT device_address, reward_date, reward, address FROM transactions WHERE transaction_id=?`,
@@ -71,7 +71,7 @@ function sendAndWriteReward(transaction_id) {
 						`UPDATE transactions SET reward_unit=?, reward_date=${db.getNow()} WHERE transaction_id=?`,
 						[unit, transaction_id],
 						() => {
-							let device = require('byteballcore/device.js');
+							let device = require('ocore/device.js');
 							device.sendMessageToDevice(row.device_address, 'text', `Sent reward`);
 							unlock();
 						}

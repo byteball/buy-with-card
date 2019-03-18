@@ -2,8 +2,8 @@
 'use strict';
 const async = require('async');
 const request = require('request');
-const conf = require('byteballcore/conf');
-const eventBus = require('byteballcore/event_bus.js');
+const conf = require('ocore/conf');
+const eventBus = require('ocore/event_bus.js');
 const notifications = require('./notifications');
 
 
@@ -22,7 +22,7 @@ function checkAllRatesUpdated() {
 	if (GBYTE_BTC_rate && BTC_USD_rate && EUR_USD_rate) {
 		bRatesReady = true;
 		console.log('rates are ready');
-		const headlessWallet = require('headless-byteball'); // start loading headless only when rates are ready
+		const headlessWallet = require('headless-obyte'); // start loading headless only when rates are ready
 		checkRatesAndHeadless();
 	}
 }

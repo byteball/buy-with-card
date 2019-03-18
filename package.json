@@ -10,9 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "async": "^2.5.0",
-    "byteballcore": "git+https://github.com/byteball/byteballcore.git",
+    "ocore": "git+https://github.com/byteball/ocore.git",
     "emailjs": "^1.0.10",
-    "headless-byteball": "git+https://github.com/byteball/headless-byteball.git",
+    "headless-obyte": "git+https://github.com/byteball/headless-obyte.git",
     "lodash": "^4.6.1",
     "request": "^2.81.0"
   }

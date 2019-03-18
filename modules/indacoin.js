@@ -2,7 +2,7 @@
 'use strict';
 const crypto = require('crypto');
 const request = require('request');
-const conf = require('byteballcore/conf.js');
+const conf = require('ocore/conf.js');
 const notifications = require('./notifications.js');
 
 
@@ -82,7 +82,7 @@ function sendRequest(path, json, handleResult) {
 			"gw-sign": getSignature(nonce)
 		}
 	};
-	const mutex = require('byteballcore/mutex.js');
+	const mutex = require('ocore/mutex.js');
 	mutex.lock(['indacoin'], unlock => {
 		request(options, (err, response, body) => {
 			unlock();

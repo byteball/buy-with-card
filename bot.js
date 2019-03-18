@@ -1,14 +1,14 @@
 /*jslint node: true */
 'use strict';
 const _ = require('lodash');
-const constants = require('byteballcore/constants.js');
-const conf = require('byteballcore/conf');
-const db = require('byteballcore/db');
-const mutex = require('byteballcore/mutex');
-const eventBus = require('byteballcore/event_bus');
+const constants = require('ocore/constants.js');
+const conf = require('ocore/conf');
+const db = require('ocore/db');
+const mutex = require('ocore/mutex');
+const eventBus = require('ocore/event_bus');
 const texts = require('./modules//texts');
-const validationUtils = require('byteballcore/validation_utils');
-const privateProfile = require('byteballcore/private_profile.js');
+const validationUtils = require('ocore/validation_utils');
+const privateProfile = require('ocore/private_profile.js');
 const notifications = require('./modules/notifications');
 const conversion = require('./modules/conversion.js');
 const indacoin = require('./modules/indacoin.js');
@@ -42,7 +42,7 @@ function queryTransactionStatus(transaction_id){
 						async () => {
 							if (status === 'processing')
 								return unlock();
-							let device = require('byteballcore/device.js');
+							let device = require('ocore/device.js');
 							device.sendMessageToDevice(row.device_address, 'text', 
 								(status === 'success') ? "Your payment was successful" : "Your payment has failed");
 							if (status === 'failed')
@@ -94,7 +94,7 @@ function pollTransactions(bOld){
 }
 
 function sendGreetingAndAskNext(from_address, userInfo){
-	let device = require('byteballcore/device.js');
+	let device = require('ocore/device.js');
 	let text = texts.greeting();
 	if (userInfo)
 		text += "\n\n" + (userInfo.cur_in ? texts.howMany(userInfo.cur_in) : texts.whatCurrency());
@@ -110,13 +110,13 @@ eventBus.on('paired', from_address => {
 });
 
 eventBus.once('headless_and_rates_ready', () => {
-	const headlessWallet = require('headless-byteball');
+	const headlessWallet = require('headless-obyte');
 	headlessWallet.setupChatEventHandlers();
 	setInterval(pollTransactions, 30*1000);
 	setInterval(() => pollTransactions(true), 30*60*1000);
 	
 	eventBus.on('text', (from_address, text) => {
-		let device = require('byteballcore/device');
+		let device = require('ocore/device');
 		text = text.trim();
 		let ucText = text.toUpperCase();
 		let lcText = text.toLowerCase();
@@ -132,7 +132,7 @@ eventBus.once('headless_and_rates_ready', () => {
 					'INSERT OR REPLACE INTO users (device_address, address) VALUES(?,?)', 
 					[from_address, address], 
 					async () => {
-						device.sendMessageToDevice(from_address, 'text', 'Saved your Byteball address'+(bWithData ? ' and personal data' : '')+'.\n\n' + texts.whatCurrency());
+						device.sendMessageToDevice(from_address, 'text', 'Saved your Obyte address'+(bWithData ? ' and personal data' : '')+'.\n\n' + texts.whatCurrency());
 						let objBonus = await bonuses.getBonus(address);
 						if (objBonus.bonus)
 							device.sendMessageToDevice(from_address, 'text', texts.bonus(objBonus));
@@ -142,7 +142,7 @@ eventBus.once('headless_and_rates_ready', () => {
 			
 			if (validationUtils.isValidAddress(ucText)) {
 			//	if (conf.bRequireRealName)
-			//		return device.sendMessageToDevice(from_address, 'text', "You have to provide your attested profile, just Byteball address is not enough.");
+			//		return device.sendMessageToDevice(from_address, 'text', "You have to provide your attested profile, just Obyte address is not enough.");
 				return handleUserAddress(ucText);
 			}
 			else if (arrProfileMatches){
@@ -265,7 +265,7 @@ eventBus.once('headless_wallet_ready', () => {
 		if (error)
 			throw new Error(error);
 		
-		const headlessWallet = require('headless-byteball');
+		const headlessWallet = require('headless-obyte');
 		headlessWallet.readSingleAddress((distributionAddress) => {
 			console.log('== distribution address: ' + distributionAddress);
 			reward.distributionAddress = distributionAddress;

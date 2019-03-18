@@ -1,12 +1,12 @@
 /*jslint node: true */
 'use strict';
-const desktopApp = require('byteballcore/desktop_app.js');
-const conf = require('byteballcore/conf.js');
+const desktopApp = require('ocore/desktop_app.js');
+const conf = require('ocore/conf.js');
 
 
 exports.greeting = () => {
 	let objBonusLevel = conf.bonuses.JEDZYC2HMGDBIDQKG3XSTXUSHMCBK725.bonus_levels[0];
-	return "Here you can buy Bytes with Visa or Mastercard.  The service is provided by indacoin.com.  This bot helps you to make a purchase by getting your order details and optionally personal data and redirecting you to indacoin.com where you enter your card details and finish the purchase.\n\nIndacoin charges "+conf.providerPercentage+"% commission but if your real name is attested (see \"Real name attestation bot\" in the Bot Store), you receive additional "+conf.rewardPercentage+"% from Byteball distribution fund (up to the total lifetime reward of $"+conf.maxTotalRewardUSD+") which offsets part of the commission you pay, so the net commission for your first purchases is "+(conf.providerPercentage-conf.rewardPercentage)+"%.  If you are attested as a Steem user with reputation over "+objBonusLevel.reputation+", you are eligible for an additional "+objBonusLevel.bonus+"% reward.";
+	return "Here you can buy Bytes with Visa or Mastercard.  The service is provided by indacoin.com.  This bot helps you to make a purchase by getting your order details and optionally personal data and redirecting you to indacoin.com where you enter your card details and finish the purchase.\n\nIndacoin charges "+conf.providerPercentage+"% commission but if your real name is attested (see \"Real name attestation bot\" in the Bot Store), you receive additional "+conf.rewardPercentage+"% from Obyte distribution fund (up to the total lifetime reward of $"+conf.maxTotalRewardUSD+") which offsets part of the commission you pay, so the net commission for your first purchases is "+(conf.providerPercentage-conf.rewardPercentage)+"%.  If you are attested as a Steem user with reputation over "+objBonusLevel.reputation+", you are eligible for an additional "+objBonusLevel.bonus+"% reward.";
 };
 
 exports.whatCurrency = () => {
