@@ -75,6 +75,7 @@ function sendRequest(path, json, handleResult) {
 		method: 'POST',
 		url: `${conf.BASE_URL}${path}`,
 		json: json,
+		timeout: 60000,
 		headers: {
 			"Content-Type": "application/json",
 			"gw-partner": conf.indacoinPartner,
