@@ -253,9 +253,6 @@ eventBus.once('headless_wallet_ready', () => {
 		if (rows.length !== arrTableNames.length)
 			error += texts.errorInitSql();
 
-		if (conf.useSmtp && (!conf.smtpUser || !conf.smtpPassword || !conf.smtpHost))
-			error += texts.errorSmtp();
-
 		if (!conf.admin_email || !conf.from_email)
 			error += texts.errorEmail();
 		
