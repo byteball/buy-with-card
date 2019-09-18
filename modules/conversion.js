@@ -44,7 +44,14 @@ function updateBittrexRates() {
 	const apiUri = 'https://bittrex.com/api/v1.1/public/getmarketsummaries';
 	request(apiUri, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
-			let arrCoinInfos = JSON.parse(body).result;
+			try {
+				var arrCoinInfos = JSON.parse(body).result;
+			}
+			catch (e) {
+				return console.log(e.toString());
+			}
+			if (!arrCoinInfos)
+				return console.log('bad rates from bittrex');
 			arrCoinInfos.forEach(coinInfo => {
 				let price = coinInfo.Last; // number
 				if (!price)
