@@ -95,6 +95,7 @@ function pollTransactions(bOld){
 
 function sendGreetingAndAskNext(from_address, userInfo){
 	let device = require('ocore/device.js');
+	return device.sendMessageToDevice(from_address, 'text', "The bot is currently disabled.  Check again in a few weeks.");
 	let text = texts.greeting();
 	if (userInfo)
 		text += "\n\n" + (userInfo.cur_in ? texts.howMany(userInfo.cur_in) : texts.whatCurrency());
@@ -117,6 +118,7 @@ eventBus.once('headless_and_rates_ready', () => {
 	
 	eventBus.on('text', (from_address, text) => {
 		let device = require('ocore/device');
+		return device.sendMessageToDevice(from_address, 'text', "The bot is currently disabled.  Check again in a few weeks.");
 		text = text.trim();
 		let ucText = text.toUpperCase();
 		let lcText = text.toLowerCase();
