@@ -14,6 +14,7 @@ const conversion = require('./modules/conversion.js');
 const indacoin = require('./modules/indacoin.js');
 const reward = require('./modules/reward.js');
 const bonuses = require('./modules/bonuses.js');
+const headlessWallet = require('headless-obyte');
 
 
 function queryTransactionStatus(transaction_id){
